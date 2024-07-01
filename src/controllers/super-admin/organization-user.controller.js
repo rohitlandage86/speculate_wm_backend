@@ -98,9 +98,7 @@ const createOrganizationUser = async (req, res) => {
     await connection.query('ROLLBACK')
     return error500(error, res)
   } finally {
-    if (connection) {
-      connection.release()
-    }
+    if (connection)  connection.release()
   }
 }
 // get organization users...

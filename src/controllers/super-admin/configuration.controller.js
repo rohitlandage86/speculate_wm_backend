@@ -105,9 +105,7 @@ const getConfigurations = async (req, res) => {
   } catch (error) {
     error500(error, res)
   } finally {
-    if (connection) {
-      await connection.release()
-    }
+    if (connection)  connection.release()
   }
 }
 //get configuration by id...
@@ -132,9 +130,7 @@ const getConfiguration = async (req, res) => {
   } catch (error) {
     error500(error, res)
   } finally {
-    if (connection) {
-      connection.release()
-    }
+    if (connection) connection.release()
   }
 }
 //update configuration

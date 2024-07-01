@@ -1,5 +1,6 @@
 const pool = require('../../../db')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 // error 422 handler
 error422 = (message, res) => {
     return res.status(422).json({
@@ -128,11 +129,26 @@ const signUpGambler = async (req, res) => {
             untitledResult.rows[0].untitled_id,
             hash
         ])
+        // Generate a JWT token
+        const token = jwt.sign(
+            {
+                untitled_id: untitledResult.rows[0].untitled_id,
+                email_id:email_id
+            },
+            'secret_this_should_be', // Use environment variable for secret key
+            { expiresIn: '1h' }
+        )
         // Commit the transaction
         await connection.query('COMMIT')
         return res.status(200).json({
             status: 200,
-            message: 'Sign up successfully '
+            message: 'Sign up successfully ',
+            token: token,
+            tokenExpiresIn: 36000,
+            data: {
+                untitled_id: untitledResult.rows[0].untitled_id,
+                email_id:email_id
+            }
         })
     } catch (error) {
         await connection.query('ROLLBACK')
@@ -142,85 +158,85 @@ const signUpGambler = async (req, res) => {
     }
 }
 //get gambler list
-const getGamblers = async (req, res)=>{
+const getGamblers = async (req, res) => {
     const { page, perPage, key } = req.query
-  let connection
-  try {
-    connection = await pool.connect()
-    let query = 'SELECT * FROM gamblers'
-    let countQuery = 'SELECT COUNT(*) AS total FROM gamblers'
-    if (key) {
-      const lowercaseKey = key.toLowerCase().trim()
-      if (key === 'activated') {
-        query += ' WHERE status = 1'
-        countQuery += ' WHERE status = 1'
-      } else if (key === 'deactivated') {
-        query += ' WHERE status = 0'
-        countQuery += ' WHERE status = 0'
-      } else {
-        query += ` WHERE LOWER(first_name) LIKE '%${lowercaseKey}%'`
-        countQuery += ` WHERE LOWER(first_name) LIKE '%${lowercaseKey}%'`
-      }
-    }
-    query += ' ORDER BY cts DESC'
-    let total = 0
-    // Apply pagination if both page and perPage are provided
-    if (page && perPage) {
-      const totalResult = await connection.query(countQuery)
-      total = parseInt(totalResult.rows[0].total)
+    let connection
+    try {
+        connection = await pool.connect()
+        let query = 'SELECT * FROM gamblers'
+        let countQuery = 'SELECT COUNT(*) AS total FROM gamblers'
+        if (key) {
+            const lowercaseKey = key.toLowerCase().trim()
+            if (key === 'activated') {
+                query += ' WHERE status = 1'
+                countQuery += ' WHERE status = 1'
+            } else if (key === 'deactivated') {
+                query += ' WHERE status = 0'
+                countQuery += ' WHERE status = 0'
+            } else {
+                query += ` WHERE LOWER(first_name) LIKE '%${lowercaseKey}%'`
+                countQuery += ` WHERE LOWER(first_name) LIKE '%${lowercaseKey}%'`
+            }
+        }
+        query += ' ORDER BY cts DESC'
+        let total = 0
+        // Apply pagination if both page and perPage are provided
+        if (page && perPage) {
+            const totalResult = await connection.query(countQuery)
+            total = parseInt(totalResult.rows[0].total)
 
-      const start = (page - 1) * perPage
-      query += ` LIMIT '${perPage}' OFFSET '${start}'`
+            const start = (page - 1) * perPage
+            query += ` LIMIT '${perPage}' OFFSET '${start}'`
+        }
+        const result = await connection.query(query)
+        const gamblers = result.rows
+        const data = {
+            status: 200,
+            message: 'Gamblers retrieved successfully',
+            data: gamblers
+        }
+        // Add pagination information if provided
+        if (page && perPage) {
+            data.pagination = {
+                per_page: perPage,
+                total: total,
+                current_page: page,
+                last_page: Math.ceil(total / perPage)
+            }
+        }
+        return res.status(200).json(data)
+    } catch (error) {
+        error500(error, res)
+    } finally {
+        if (connection) await connection.release()
     }
-    const result = await connection.query(query)
-    const gamblers = result.rows
-    const data = {
-      status: 200,
-      message: 'Gamblers retrieved successfully',
-      data: gamblers
-    }
-    // Add pagination information if provided
-    if (page && perPage) {
-      data.pagination = {
-        per_page: perPage,
-        total: total,
-        current_page: page,
-        last_page: Math.ceil(total / perPage)
-      }
-    }
-    return res.status(200).json(data)
-  } catch (error) {
-    error500(error, res)
-  } finally {
-    if (connection) await connection.release()
-  }
 
 }
 //get gambler by id...
 const getGambler = async (req, res) => {
     const gambler_id = req.params.id
-  
+
     let connection
     try {
-      connection = await pool.connect()
-      let query = 'SELECT * FROM gamblers WHERE gambler_id = $1'
-      const result = await connection.query(query, [gambler_id])
-      if (result.rowCount === 0) {
-        return error422('Gambler is Not Found', res)
-      }
-      const gambler = result.rows[0]
-      const data = {
-        status: 200,
-        message: 'Gambler retrieved successfully',
-        data: gambler
-      }
-      return res.status(200).json(data)
+        connection = await pool.connect()
+        let query = 'SELECT * FROM gamblers WHERE gambler_id = $1'
+        const result = await connection.query(query, [gambler_id])
+        if (result.rowCount === 0) {
+            return error422('Gambler is Not Found', res)
+        }
+        const gambler = result.rows[0]
+        const data = {
+            status: 200,
+            message: 'Gambler retrieved successfully',
+            data: gambler
+        }
+        return res.status(200).json(data)
     } catch (error) {
-      error500(error, res)
+        error500(error, res)
     } finally {
-      if (connection) connection.release()
+        if (connection) connection.release()
     }
-  }
+}
 
 module.exports = {
     signUpGambler,
