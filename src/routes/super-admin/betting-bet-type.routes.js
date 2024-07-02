@@ -8,6 +8,8 @@ router.post('/',checkAuth, bettingBetTypeController.createBettingBetType )
 router.get('/', checkAuth, bettingBetTypeController.getBettingBetTypes);
 //get betting bet types list wma
 router.get('/wma', bettingBetTypeController.getBettingBetTypesWma);
+//get betting bet types list wma by sport id
+router.get('/wma/:id', bettingBetTypeController.getBettingBetTypesWmaBySportId);
 //update betting bet type
 router.put('/:id', checkAuth, bettingBetTypeController.updateBettingBetType)
 //get betting bet type by id

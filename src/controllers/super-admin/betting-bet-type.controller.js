@@ -299,12 +299,38 @@ const getBettingBetTypesWma = async (req, res) => {
   }
 }
 
+//get betting bet types Wma by sport id 
+const getBettingBetTypesWmaBySportId = async (req, res) => {
+  const sport_id = parseInt(req.params.id)
+
+  if (!sport_id) {
+    return error422('Sport id is required.', res)
+  }
+  let connection
+  connection = await pool.connect()
+  try {
+    let query = `SELECT * FROM betting_bet_types WHERE sport_id = ${sport_id} AND  status = 1 ORDER BY cts DESC`
+    const result = await connection.query(query)
+    const bettingBetTypes = result.rows
+    return res.status(200).json({
+      status: 200,
+      message: 'Betting bet type retrieved successfully.',
+      data: bettingBetTypes
+    })
+  } catch (error) {
+    return error500(error, res)
+  } finally {
+    if (connection) connection.release()
+  }
+}
+
 module.exports = {
   createBettingBetType,
   getBettingBetTypes,
   getBettingBetType,
   updateBettingBetType,
   onStatusChange,
-  getBettingBetTypesWma
+  getBettingBetTypesWma,
+  getBettingBetTypesWmaBySportId
 
 }
