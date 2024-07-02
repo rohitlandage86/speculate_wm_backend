@@ -116,7 +116,10 @@ const loginSuperAdmin = async (req, res) => {
       }
       userData = orgUserResult.rows[0]
     } else if (untitledData.user_type_id == 4) {
-      console.log('gambler loging')
+      userData = {
+        untitled_id: untitledData.untitled_id,
+        email_id: untitledData.email_id
+      }
     }
 
     // Generate a JWT token
