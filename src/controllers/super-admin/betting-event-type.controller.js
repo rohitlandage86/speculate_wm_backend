@@ -36,18 +36,20 @@ const createBettingEventType = async (req, res) => {
     connection = await pool.connect()
     //check is name exist
     let checkNameExist =
-      'SELECT * FROM betting_event_types WHERE TRIM(LOWER(name)) = $1'
+      'SELECT * FROM betting_event_types WHERE TRIM(LOWER(name)) = $1 AND sport_id = $2'
     let nameResult = await connection.query(checkNameExist, [
-      name.toLowerCase()
+      name.toLowerCase(),
+      sport_id
     ])
     if (nameResult.rowCount > 0) {
       return error422('Name already exist.', res)
     }
     //check is record id exist
     let checkRecordIdExist =
-      'SELECT * FROM betting_event_types WHERE record_id = $1'
+      'SELECT * FROM betting_event_types WHERE record_id = $1 AND sport_id = $2'
     let recordIdResult = await connection.query(checkRecordIdExist, [
-      record_id
+      record_id,
+      sport_id
     ])
     if (recordIdResult.rowCount > 0) {
       return error422('Record id already exist.', res)
@@ -187,9 +189,10 @@ const updateBettingEventType = async (req, res) => {
   }
   //check is name exist
   const checkBettingEventTypeNameQuery =
-    'SELECT * FROM betting_event_types WHERE TRIM(LOWER(name)) = $1 AND betting_event_type_id != $2'
+    'SELECT * FROM betting_event_types WHERE (TRIM(LOWER(name)) = $1 AND sport_id = $2 ) AND betting_event_type_id != $3'
   const checkBettingEventTypeNameResult = await connection.query(checkBettingEventTypeNameQuery, [
     name.toLowerCase(),
+    sport_id,
     betting_event_type_id
   ])
   if (checkBettingEventTypeNameResult.rowCount > 0) {
@@ -197,9 +200,10 @@ const updateBettingEventType = async (req, res) => {
   }
   //check is record id  exist
   const checkBettingEventTypeRecordIdQuery =
-    'SELECT * FROM betting_event_types WHERE record_id = $1 AND betting_event_type_id != $2'
+    'SELECT * FROM betting_event_types WHERE (record_id = $1 AND sport_id = $2) AND betting_event_type_id != $3'
   const checkBettingEventTypeRecordIdResult = await connection.query(checkBettingEventTypeRecordIdQuery, [
     record_id,
+    sport_id,
     betting_event_type_id
   ])
   if (checkBettingEventTypeRecordIdResult.rowCount > 0) {

@@ -399,7 +399,7 @@ const getSportsWma = async (req, res) => {
   let connection
   connection = await pool.connect()
   try {
-    let query = 'SELECT * FROM sports WHERE status = 1 ORDER BY cts DESC'
+    let query = 'SELECT * FROM sports WHERE status = 1 ORDER BY cts ASC'
     const result = await connection.query(query)
     const sports = result.rows
     return res.status(200).json({

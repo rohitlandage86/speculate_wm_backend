@@ -15,7 +15,7 @@ const bettingPeriodTypeRoutes = require('./src/routes/super-admin/betting-period
 const bettingMarketTypeRoutes = require('./src/routes/super-admin/betting-market-type.routes')
 const bettingBetTypeRoutes = require('./src/routes/super-admin/betting-bet-type.routes')
 const bettingMarketRoutes = require('./src/routes/super-admin/betting-market.routes')
-
+const sportsDataRoutes = require('./src/routes/sports-data/sports-data.routes')
 const path = require('path')
 app.use(express.json({ limit: '50mb' }))
 
@@ -59,6 +59,7 @@ app.use('/v1/api/betting-period-type', bettingPeriodTypeRoutes)
 app.use('/v1/api/betting-market-type', bettingMarketTypeRoutes)
 app.use('/v1/api/betting-bet-type', bettingBetTypeRoutes)
 app.use('/v1/api/betting-market', bettingMarketRoutes)
+app.use('/v1/api/sports-data',sportsDataRoutes)
 
 app.get('/', (req, res) => {
   res.send('Welcome to speculate Api')

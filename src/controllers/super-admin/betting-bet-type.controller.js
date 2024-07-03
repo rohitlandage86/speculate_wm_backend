@@ -37,18 +37,20 @@ const createBettingBetType = async (req, res) => {
     connection = await pool.connect()
     //check is name exist
     let checkNameExist =
-      'SELECT * FROM betting_bet_types WHERE TRIM(LOWER(name)) = $1'
+      'SELECT * FROM betting_bet_types WHERE TRIM(LOWER(name)) = $1 AND sport_id = $2'
     let nameResult = await connection.query(checkNameExist, [
-      name.toLowerCase()
+      name.toLowerCase(),
+      sport_id
     ])
     if (nameResult.rowCount > 0) {
       return error422('Name already exist.', res)
     }
     //check is record id exist
     let checkRecordIdExist =
-      'SELECT * FROM betting_bet_types WHERE record_id = $1'
+      'SELECT * FROM betting_bet_types WHERE record_id = $1 AND sport_id = $2'
     let recordIdResult = await connection.query(checkRecordIdExist, [
-      record_id
+      record_id,
+      sport_id
     ])
     if (recordIdResult.rowCount > 0) {
       return error422('Record id already exist.', res)
@@ -188,9 +190,10 @@ const updateBettingBetType = async (req, res) => {
   }
   //check is name exist
   const checkBettingBetTypeNameQuery =
-    'SELECT * FROM betting_bet_types WHERE TRIM(LOWER(name)) = $1 AND betting_bet_type_id != $2'
+    'SELECT * FROM betting_bet_types WHERE (TRIM(LOWER(name)) = $1 AND sport_id = $2) AND betting_bet_type_id != $3'
   const checkBettingBetTypeNameResult = await connection.query(checkBettingBetTypeNameQuery, [
     name.toLowerCase(),
+    sport_id,
     betting_bet_type_id
   ])
   if (checkBettingBetTypeNameResult.rowCount > 0) {
@@ -198,9 +201,10 @@ const updateBettingBetType = async (req, res) => {
   }
   //check is record id  exist
   const checkBettingBetTypeRecordIdQuery =
-    'SELECT * FROM betting_bet_types WHERE record_id = $1 AND betting_bet_type_id != $2'
+    'SELECT * FROM betting_bet_types WHERE (record_id = $1 AND sport_id = $2) AND betting_bet_type_id != $3'
   const checkBettingBetTypeRecordIdResult = await connection.query(checkBettingBetTypeRecordIdQuery, [
     record_id,
+    sport_id,
     betting_bet_type_id
   ])
   if (checkBettingBetTypeRecordIdResult.rowCount > 0) {

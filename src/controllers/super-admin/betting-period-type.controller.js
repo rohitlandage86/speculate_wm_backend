@@ -37,18 +37,20 @@ const createBettingPeriodType = async (req, res) => {
     connection = await pool.connect()
     //check is name exist
     let checkNameExist =
-      'SELECT * FROM betting_period_types WHERE TRIM(LOWER(name)) = $1'
+      'SELECT * FROM betting_period_types WHERE TRIM(LOWER(name)) = $1 AND sport_id = $2'
     let nameResult = await connection.query(checkNameExist, [
-      name.toLowerCase()
+      name.toLowerCase(),
+      sport_id
     ])
     if (nameResult.rowCount > 0) {
       return error422('Name already exist.', res)
     }
     //check is record id exist
     let checkRecordIdExist =
-      'SELECT * FROM betting_period_types WHERE record_id = $1'
+      'SELECT * FROM betting_period_types WHERE record_id = $1 AND sport_id = $2'
     let recordIdResult = await connection.query(checkRecordIdExist, [
-      record_id
+      record_id,
+      sport_id
     ])
     if (recordIdResult.rowCount > 0) {
       return error422('Record id already exist.', res)
@@ -188,9 +190,10 @@ const updateBettingPeriodType = async (req, res) => {
   }
   //check is name exist
   const checkBettingPeriodTypeNameQuery =
-    'SELECT * FROM betting_period_types WHERE TRIM(LOWER(name)) = $1 AND betting_period_type_id != $2'
+    'SELECT * FROM betting_period_types WHERE (TRIM(LOWER(name)) = $1 AND sport_id = $2 ) AND betting_period_type_id != $3'
   const checkBettingPeriodTypeNameResult = await connection.query(checkBettingPeriodTypeNameQuery, [
     name.toLowerCase(),
+    sport_id,
     betting_period_type_id
   ])
   if (checkBettingPeriodTypeNameResult.rowCount > 0) {
@@ -198,9 +201,10 @@ const updateBettingPeriodType = async (req, res) => {
   }
   //check is record id  exist
   const checkBettingPeriodTypeRecordIdQuery =
-    'SELECT * FROM betting_period_types WHERE record_id = $1 AND betting_period_type_id != $2'
+    'SELECT * FROM betting_period_types WHERE (record_id = $1 AND sport_id = $2 ) AND betting_period_type_id != $3'
   const checkBettingPeriodTypeRecordIdResult = await connection.query(checkBettingPeriodTypeRecordIdQuery, [
     record_id,
+    sport_id,
     betting_period_type_id
   ])
   if (checkBettingPeriodTypeRecordIdResult.rowCount > 0) {

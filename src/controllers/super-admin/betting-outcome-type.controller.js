@@ -37,18 +37,20 @@ const createBettingOutcomeType = async (req, res) => {
     connection = await pool.connect()
     //check is name exist
     let checkNameExist =
-      'SELECT * FROM betting_outcome_types WHERE TRIM(LOWER(name)) = $1'
+      'SELECT * FROM betting_outcome_types WHERE TRIM(LOWER(name)) = $1 AND sport_id = $2'
     let nameResult = await connection.query(checkNameExist, [
-      name.toLowerCase()
+      name.toLowerCase(),
+      sport_id
     ])
     if (nameResult.rowCount > 0) {
       return error422('Name already exist.', res)
     }
     //check is record id exist
     let checkRecordIdExist =
-      'SELECT * FROM betting_outcome_types WHERE record_id = $1'
+      'SELECT * FROM betting_outcome_types WHERE record_id = $1 AND sport_id = $2'
     let recordIdResult = await connection.query(checkRecordIdExist, [
-      record_id
+      record_id,
+      sport_id
     ])
     if (recordIdResult.rowCount > 0) {
       return error422('Record id already exist.', res)
@@ -188,9 +190,10 @@ const updateBettingOutcomeType = async (req, res) => {
   }
   //check is name exist
   const checkBettingOutcomeTypeNameQuery =
-    'SELECT * FROM betting_outcome_types WHERE TRIM(LOWER(name)) = $1 AND betting_outcome_type_id != $2'
+    'SELECT * FROM betting_outcome_types WHERE (TRIM(LOWER(name)) = $1 AND sport_id = $2 ) AND betting_outcome_type_id != $3'
   const checkBettingOutcomeTypeNameResult = await connection.query(checkBettingOutcomeTypeNameQuery, [
     name.toLowerCase(),
+    sport_id,
     betting_outcome_type_id
   ])
   if (checkBettingOutcomeTypeNameResult.rowCount > 0) {
@@ -198,9 +201,10 @@ const updateBettingOutcomeType = async (req, res) => {
   }
   //check is record id  exist
   const checkBettingOutcomeTypeRecordIdQuery =
-    'SELECT * FROM betting_outcome_types WHERE record_id = $1 AND betting_outcome_type_id != $2'
+    'SELECT * FROM betting_outcome_types WHERE (record_id = $1 AND sport_id = $2 ) AND betting_outcome_type_id != $3'
   const checkBettingOutcomeTypeRecordIdResult = await connection.query(checkBettingOutcomeTypeRecordIdQuery, [
     record_id,
+    sport_id,
     betting_outcome_type_id
   ])
   if (checkBettingOutcomeTypeRecordIdResult.rowCount > 0) {
