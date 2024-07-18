@@ -1,4 +1,3 @@
-const { response } = require('express');
 const pool = require('../../../db')
 const axios = require('axios');
 //error 422 handler
@@ -50,16 +49,16 @@ const getSportsData = async (req, res) => {
             return error422('Betting period type is Not Found', res)
         }
         //betting bet type id is exist...
-        let isBettingBetTypeIdExistQuery = 'SELECT * FROM betting_bet_types WHERE betting_bet_type_id = $1'
-        const isBettingBetTypeIdExistResult = await connection.query(isBettingBetTypeIdExistQuery, [betting_bet_type_id])
+        let isBettingBetTypeIdExistQuery = 'SELECT * FROM betting_bet_types WHERE betting_bet_type_id = $1 AND sport_id = $2'
+        const isBettingBetTypeIdExistResult = await connection.query(isBettingBetTypeIdExistQuery, [betting_bet_type_id, sport_id])
         const bettingBetTypeData = isBettingBetTypeIdExistResult.rows[0]
         if (isBettingBetTypeIdExistResult.rowCount === 0) {
             return error422('Betting bet type is Not Found', res)
         }
         //betting market type is exist...
-        let isBettingMarketTypeExistQuery = `SELECT * FROM betting_market_types WHERE betting_market_type_id = $1`
+        let isBettingMarketTypeExistQuery = `SELECT * FROM betting_market_types WHERE betting_market_type_id = $1 `
         const isBettingMarketTypeExistResult = await connection.query(isBettingMarketTypeExistQuery,[betting_market_type_id])
-        
+        const bettingMarketTypeData = isBettingMarketTypeExistResult.rows[0]
         if (isBettingMarketTypeExistResult.rowCount === 0) {
             return error422("Betting market type is Not Found.", res)
         }
@@ -73,7 +72,7 @@ const getSportsData = async (req, res) => {
                 const element = response.data[index];
                 for (let bettingIndex = 0; bettingIndex < element.BettingMarkets.length; bettingIndex++) {
                     const BettingMarket = element.BettingMarkets[bettingIndex]
-                    if (BettingMarket.BettingBetTypeID == betting_bet_type_id&&BettingMarket.AnyBetsAvailable == AnyBetsAvailable&&BettingMarket.BettingPeriodTypeID == betting_period_type_id&&BettingMarket.BettingMarketTypeID == betting_market_type_id) {
+                    if (BettingMarket.BettingBetTypeID == bettingBetTypeData.record_id &&BettingMarket.AnyBetsAvailable == AnyBetsAvailable&&BettingMarket.BettingPeriodTypeID == bettingPeriodTypeData.record_id &&BettingMarket.BettingMarketTypeID == bettingMarketTypeData.record_id) {
                         bettingMarkets.push(BettingMarket)
                     }
 
