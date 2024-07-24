@@ -106,7 +106,7 @@ const loginSuperAdmin = async (req, res) => {
     let userData = {}
     if (untitledData.user_type_id == 1) {
       userData = untitledData
-    } else if (untitledData.user_type_id == 2||untitledData.user_type_id == 3) {
+    } else if (untitledData.user_type_id == 2 || untitledData.user_type_id == 3) {
       // Check if organization user exists
       const checkOrgUserQuery =
         'SELECT * FROM organization_users WHERE org_uid = $1'
@@ -116,9 +116,18 @@ const loginSuperAdmin = async (req, res) => {
       }
       userData = orgUserResult.rows[0]
     } else if (untitledData.user_type_id == 4) {
+      //get configuration list 
+      let getConfigurationsQuery = 'SELECT * FROM configuration WHERE status = 1';
+      let getConfigurationsResult = await connection.query(getConfigurationsQuery);
+      let configurations=[]
+      if (getConfigurationsResult.rowCount != 0) {
+        configurations = getConfigurationsResult.rows;
+      }
       userData = {
         untitled_id: untitledData.untitled_id,
-        email_id: untitledData.email_id
+        email_id: untitledData.email_id,
+        configurations: configurations,
+        user_type_id: untitledData.user_type_id
       }
     }
 
@@ -144,7 +153,28 @@ const loginSuperAdmin = async (req, res) => {
     return error500(error, res)
   }
 }
+//get user types Wma...
+const getUserTypesWma = async (req, res) => {
+  let connection
+  connection = await pool.connect()
+  try {
+    let query =
+      'SELECT * FROM user_type WHERE status = 1 ORDER BY cts ASC'
+    const result = await connection.query(query)
+    const user_types = result.rows
+    return res.status(200).json({
+      status: 200,
+      message: 'User Types retrieved successfully.',
+      data: user_types
+    })
+  } catch (error) {
+    return error500(error, res)
+  } finally {
+    if (connection) connection.release()
+  }
+}
 module.exports = {
   createSuperAdmin,
-  loginSuperAdmin
+  loginSuperAdmin,
+  getUserTypesWma
 }

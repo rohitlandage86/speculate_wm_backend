@@ -68,6 +68,7 @@ const createOrganization = async (req, res) => {
       __dirname,
       '..',
       '..',
+      '..',
       'images',
       'logo1',
       logo1FileName
@@ -86,6 +87,7 @@ const createOrganization = async (req, res) => {
     logo2FileName = `${org_name}_${timestamp}${fileExtension}`
     logo2FilePath = path.join(
       __dirname,
+      '..',
       '..',
       '..',
       'images',
@@ -149,10 +151,10 @@ const createOrganization = async (req, res) => {
     }
     //check is Contact Number exist...
     const checkContactNumberQuery =
-      'SELECT * FROM organization WHERE TRIM(LOWER(contact_number)) = $1'
+      'SELECT * FROM organization WHERE TRIM(contact_number) = $1'
     const checkContactNumberResult = await connection.query(
       checkContactNumberQuery,
-      [contact_number.toLowerCase()]
+      [contact_number]
     )
     if (checkContactNumberResult.rowCount > 0) {
       if (fs.existsSync(logo1FilePath)) {
@@ -368,6 +370,7 @@ const updateOrganization = async (req, res) => {
       __dirname,
       '..',
       '..',
+      '..',
       'images',
       'logo1',
       logo1FileName
@@ -386,6 +389,7 @@ const updateOrganization = async (req, res) => {
     logo2FileName = `${org_name}_${timestamp}${fileExtension}`
     logo2FilePath = path.join(
       __dirname,
+      '..',
       '..',
       '..',
       'images',
@@ -426,6 +430,7 @@ const updateOrganization = async (req, res) => {
         __dirname,
         '..',
         '..',
+        '..',
         'images',
         'logo1',
         orgResult.rows[0].logo1
@@ -439,6 +444,7 @@ const updateOrganization = async (req, res) => {
       let logo2FilePathExist
       logo2FilePathExist = path.join(
         __dirname,
+        '..',
         '..',
         '..',
         'images',
@@ -528,6 +534,7 @@ const signUpOrganization = async (req, res) => {
       logoFileName = `${organization_name}_${timestamp}${fileExtension}`
       logoFilePath = path.join(
         __dirname,
+        '..',
         '..',
         '..',
         'images',

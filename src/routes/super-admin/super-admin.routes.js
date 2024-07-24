@@ -6,5 +6,7 @@ const router = express.Router()
 router.post('/', organizationController.createSuperAdmin)
 //login  
 router.post('/login', organizationController.loginSuperAdmin)
+//get all user type wma
+router.get('/user-type', organizationController.getUserTypesWma)
 
 module.exports = router

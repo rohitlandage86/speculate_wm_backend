@@ -65,11 +65,12 @@ const createOrganizationUser = async (req, res) => {
     ])
     //insert into untitled table
     const untitledQuery =
-      'INSERT INTO untitled ( user_name, email_id, user_type_id) VALUES ($1, $2, $3) RETURNING untitled_id '
+      'INSERT INTO untitled ( user_name, email_id, user_type_id) VALUES ($1, $2, $3, $4) RETURNING untitled_id '
     const untitledResult = await connection.query(untitledQuery, [
       user_name,
       email_id,
-      user_type_id
+      user_type_id,
+      orgUserResult.rows[0].org_uid
     ])
     let length = 8,
       charset =
@@ -314,6 +315,7 @@ const signUpOrganizationUser = async (req, res) => {
       logoFileName = `${organization_name}_${timestamp}${fileExtension}`
       logoFilePath = path.join(
         __dirname,
+        '..',
         '..',
         '..',
         'images',
