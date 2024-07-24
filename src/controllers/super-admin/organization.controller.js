@@ -823,11 +823,34 @@ const onStatusChange = async (req, res) => {
     })
   }
 }
+//get organizations Wma...
+const getOrganizationsWma = async (req, res)=>{
+  let connection
+  connection = await pool.connect()
+  try{
+      let query = "SELECT * FROM organization ORDER BY cts DESC";
+      const result = await connection.query(query);
+      const organization = result.rows;
+      return  res.status(200).json({
+          status:200,
+          message:"Organization retrieved successfully.",
+          data: organization
+      });
+
+  } catch (error){
+     return error500(error,res)
+  } finally {
+      if(connection) connection.release()
+  }
+
+
+}
 module.exports = {
   createOrganization,
   getOrganizations,
   getOrganization,
-  updateOrganization
+  updateOrganization,
+  getOrganizationsWma
   // organizationSignUp,
   // organizationLogin,
   // onStatusChange

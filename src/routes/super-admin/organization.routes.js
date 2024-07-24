@@ -10,6 +10,8 @@ const router = express.Router()
 router.post('/', checkAuth, organizationController.createOrganization)
 //get organziation list
 router.get('/', checkAuth, organizationController.getOrganizations)
+//get Organization list wma
+router.get('/wma', organizationController.getOrganizationsWma)
 //update organization 
 router.put('/:id', checkAuth, organizationController.updateOrganization)
 // organization by id
