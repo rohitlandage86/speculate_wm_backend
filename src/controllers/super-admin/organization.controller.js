@@ -209,6 +209,9 @@ const getOrganizations = async (req, res) => {
   try {
     let query = `SELECT * FROM organization`
     let countQuery = ` SELECT COUNT(*) AS total FROM organization`
+
+    query += ' ORDER BY cts DESC '
+    
     let total = 0
     // Apply pagination if both page and perPage are provided
     if (page && perPage) {
@@ -256,7 +259,41 @@ const getOrganization = async (req, res) => {
     if (result.rowCount === 0) {
       return error422('Organization is Not Found', res)
     }
-    const organization = result.rows[0]
+    let organization = result.rows[0]
+    // Read the logo1 file and convert it to base64
+    const logo1FilePath = path.join(
+      __dirname,
+      '..',
+      '..',
+      '..',
+      'images',
+      'logo1',
+      organization.logo1
+    );
+
+    let logo1Base64 = '';
+    if (fs.existsSync(logo1FilePath)) {
+      const logo1Buffer = fs.readFileSync(logo1FilePath);
+      logo1Base64 = logo1Buffer.toString('base64');
+    }
+        // Read the logo2 file and convert it to base64
+        const logo2FilePath = path.join(
+          __dirname,
+          '..',
+          '..',
+          '..',
+          'images',
+          'logo2',
+          organization.logo2
+        );
+    
+        let logo2Base64 = '';
+        if (fs.existsSync(logo2FilePath)) {
+          const logo2Buffer = fs.readFileSync(logo2FilePath);
+          logo2Base64 = logo2Buffer.toString('base64');
+        }
+    organization.logo1Base64 = logo1Base64
+    organization.logo2Base64 = logo2Base64
     return res.status(200).json({
       status: 200,
       message: 'Organization retrieved successfully.',

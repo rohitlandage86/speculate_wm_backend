@@ -190,7 +190,7 @@ const updateBettingMarketType = async (req, res) => {
   }
   //check is name exist
   const checkBettingMarketTypeNameQuery =
-    'SELECT * FROM betting_market_types WHERE (TRIM(LOWER(name)) = $1 AND sport_id = 2) AND betting_market_type_id != $3'
+    'SELECT * FROM betting_market_types WHERE (TRIM(LOWER(name)) = $1 AND sport_id = $2) AND betting_market_type_id != $3'
   const checkBettingMarketTypeNameResult = await connection.query(checkBettingMarketTypeNameQuery, [
     name.toLowerCase(),
     sport_id,

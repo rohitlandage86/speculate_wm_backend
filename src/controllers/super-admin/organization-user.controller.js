@@ -65,7 +65,7 @@ const createOrganizationUser = async (req, res) => {
     ])
     //insert into untitled table
     const untitledQuery =
-      'INSERT INTO untitled ( user_name, email_id, user_type_id) VALUES ($1, $2, $3, $4) RETURNING untitled_id '
+      'INSERT INTO untitled ( user_name, email_id, user_type_id, org_uid) VALUES ($1, $2, $3, $4) RETURNING untitled_id '
     const untitledResult = await connection.query(untitledQuery, [
       user_name,
       email_id,
@@ -109,6 +109,7 @@ const getOrganizationUsers = async (req, res) => {
   try {
     let query = `SELECT * FROM organization_users`
     let countQuery = ` SELECT COUNT(*) AS total FROM organization_users`
+    query += ' ORDER BY cts DESC '
     let total = 0
     // Apply pagination if both page and perPage are provided
     if (page && perPage) {
